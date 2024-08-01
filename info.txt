@@ -1,0 +1,109 @@
+The command used to compile the executable is
+`gcc -Wall driver.c fcfs.c sjsf.c priority.c segment.c -o memMan`
+The compiler used is gcc 9.4.0 on a Ubuntu 20.04.1 system
+
+More details on how to execute the binary have been specified 
+at the start of the driver.c source file as a comment block under 
+the DOCUMENTATION section.
+However, the basics are:
+    `./memMan -{algorithmFlag} {process_file_path} {total_memory}`
+
+There are four algorithms flags that can be set:
+-f; -s; -S; -p
+Moreover, -S can also run in verbose mode by setting flag as -Sv
+
+Additional constraints are and specifications are mentioned in the 
+DOCUMENTATION section.
+
+
+We also run the python script "random/random_input_gen.py" using the 
+Python 3.8.10 interpreter with a numpy 1.24.2 dependency.
+
+The script produces that tests the memory management simulation under the 
+constraints defined by me. It runs each algorithm 1000 times and prints out 
+the average time to form that allocation decision.
+
+
+From that result:
+~0.19 ms required for FCFS algorithm
+~0.23 ms required for SJSF algorithm
+~0.24 ms required for Priority algorithm
+~1.10 ms required for Segmentation algorithm
+
+SJSF and Priority algorithm require about the same time.
+SJSF is ~17.5% slower than FCFS.
+Priority is ~20% slower than FCFS.
+
+Segmentation algorithm takes the longest amount of time 
+and is ~83% slower than FCFS algorithm.
+
+
+The above result is what was expected.
+
+
+Test Case 1..4 are checking the constraints that have been 
+specified are working and throwing the correct errors.
+
+Test Case 1 (FCFS algorithm) checks for non-negative integer for process_size 
+and checking dummy value ignorance.
+
+Test Case 2 (SJSF algorithm) does the same check as 1, however, a different 
+error is thrown. This is because the error is caught during pre-processing 
+(sorting) and does not allocate memory because it caannot finish the sorting.
+The same problem does not occur in test case 1 as, the decision to allocate 
+failing just leads to ignoring that process.
+
+Test Case 3 (Priority algorithm) does negative checks on the priority 
+and throws the same error as test case 2.
+
+Test Case 4 (Segmentation algorithm) does size 0 segment checks (no error),
+negative segments check and negative segment check.
+
+
+
+The command `./memMan -s "random/input2.txt" 65536`
+fortuitously has a case where all the memory is filled up.
+This does not have any bugs and works as intended. However, this highlights 
+an easy optimisation that I have not made is to stop making allocation decision
+if the Free set is empty.
+
+
+## Note:
+- The python script that generates the random inputs is in the random folder.
+
+- We can use the verbose option in Segmentation algorithm to see the memory 
+  laid out being more readable.
+- There are multiple ways I would change the way the experiment is structured; 
+  the obvious one is to have the verbose option (summary) be the default (and 
+  other algorithms having the same option) while the current default be the verbose
+  option.
+--- The full output for all the test (and random) cases can be found by running the 
+    commands given below. The process files (inputs) are attached in this zip.
+
+
+Commands used in test.sh script:
+    
+    Random FCFS algo
+        `./memMan -f "random/input1.txt" 65536`
+    
+    Random SJSF algo
+        `./memMan -s "random/input2.txt" 65536`
+    
+    Random Priority algo
+        `./memMan -p "random/input3.txt" 65536`
+    
+    Random Segmentation algo
+        `./memMan -S "random/input4.txt" 65536`
+
+    
+    Test Case 1:
+        `./memMan -f "test/small_input1.txt" 1024`
+    
+    Test Case 2:
+        `./memMan -s "test/small_input2.txt" 1024`
+
+    Test Case 3:
+        `./memMan -p "test/small_input3.txt" 1024`
+    
+    Test Case 4:
+        `./memMan -Sv "test/small_input4a.txt" 1024 && ./memMan -Sv "test/small_input4b.txt" 1024`
